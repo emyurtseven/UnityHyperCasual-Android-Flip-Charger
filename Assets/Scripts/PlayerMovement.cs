@@ -11,9 +11,19 @@ public class PlayerMovement : MonoBehaviour
 
     int playerCurrentLane = 0;
 
+    ParticleSystem trailParticles;
+
     bool controlsActive = true;
 
     public bool ControlsActive { get => controlsActive; set => controlsActive = value; }
+
+    private void Start() 
+    {
+        trailParticles = GetComponent<ParticleSystem>();
+        EventManager.AddNoArgumentListener(SetParticleSpeed, EventType.DifficultyChanged);
+
+        SetParticleSpeed();
+    }
 
     private void OnFlip()
     {
@@ -31,7 +41,11 @@ public class PlayerMovement : MonoBehaviour
         transform.position = new Vector2(transform.position.x, playerYPositions[playerCurrentLane]);
     }
 
-
+    private void SetParticleSpeed()
+    {
+        var main = trailParticles.main;
+        main.startSpeed = GameManager.Instance.GameSpeed;
+    }
 
     IEnumerator LerpPosition(Vector2 targetPosition, float duration)
     {

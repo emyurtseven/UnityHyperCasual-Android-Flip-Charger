@@ -23,7 +23,7 @@ public class Obstacle : MonoBehaviour
 
     private void Start() 
     {
-        EventManager.AddNoArgumentListener(OnDifficultyUpListener, EventType.DifficultyUp);
+        EventManager.AddNoArgumentListener(SetSpeed, EventType.DifficultyChanged);
     }
 
     private void OnEnable() 
@@ -39,7 +39,7 @@ public class Obstacle : MonoBehaviour
     /// <summary>
     /// Listener for difficulty up event which is invoked from GameManager
     /// </summary>
-    private void OnDifficultyUpListener()
+    private void SetSpeed()
     {
         moveSpeed = GameManager.Instance.GameSpeed;
         myRigidbody.velocity = new Vector2(-moveSpeed, 0);

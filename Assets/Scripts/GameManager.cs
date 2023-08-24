@@ -35,6 +35,7 @@ public class GameManager : Invoker
 
     // listeners for this are set in editor instead of scripts
     NoArgumentEvent difficultyUpEvent = new NoArgumentEvent();
+    NoArgumentEvent gameOverEvent = new NoArgumentEvent();
 
     int highScore;
 
@@ -74,8 +75,11 @@ public class GameManager : Invoker
 
     private void Start() 
     {
-        noArgEventDict.Add(EventType.DifficultyUp, difficultyUpEvent);
-        EventManager.AddNoArgumentInvoker(this, EventType.DifficultyUp);
+        noArgEventDict.Add(EventType.DifficultyChanged, difficultyUpEvent);
+        EventManager.AddNoArgumentInvoker(this, EventType.DifficultyChanged);
+
+        noArgEventDict.Add(EventType.GameOver, gameOverEvent);
+        EventManager.AddNoArgumentInvoker(this, EventType.GameOver);
 
         gameSpeedCurrent = gameSpeedStart;
         minIntervalCurrent = startingMinSpawnInterval;
@@ -112,11 +116,10 @@ public class GameManager : Invoker
         if (scoreCurrent % difficultyUpThreshold == 0)
         {
             gameSpeedCurrent += gameSpeedIncrement;
-
             minIntervalCurrent = Mathf.Max(0.2f, minIntervalCurrent - minSpawnDecrement);
             maxIntervalCurrent = Mathf.Max(0.4f, maxIntervalCurrent - maxSpawnDecrement);
 
-            InvokeNoArgumentEvent(EventType.DifficultyUp);
+            InvokeNoArgumentEvent(EventType.DifficultyChanged);
         }
     }
 
@@ -157,12 +160,13 @@ public class GameManager : Invoker
 
     private void GameOver()
     {
+        InvokeNoArgumentEvent(EventType.GameOver);
+
         Time.timeScale = 0;
         playerMovement.ControlsActive = false;
         playerParticles.Pause();
         AudioManager.StopMusic(0);
 
-        UIManager.Instance.OnGameOver();
         SaveScore();
     }
 
@@ -177,6 +181,8 @@ public class GameManager : Invoker
         gameSpeedCurrent = gameSpeedStart;
         minIntervalCurrent = startingMinSpawnInterval;
         maxIntervalCurrent = startingMaxSpawnInterval;
+
+        InvokeNoArgumentEvent(EventType.DifficultyChanged);
 
         ObjectPool.ReturnAllPooledObjects();    // return currently active obstacles to pool
 

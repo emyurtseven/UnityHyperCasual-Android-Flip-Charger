@@ -6,5 +6,6 @@ using UnityEngine.Events;
 public enum EventType
 {
     CameraShake,
-    DifficultyUp
+    DifficultyChanged,
+    GameOver
 }

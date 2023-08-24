@@ -15,10 +15,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject HUDPanel;
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] TextMeshProUGUI highScoreText;
-    [SerializeField] GameObject livesPanel;
+    [SerializeField] GameObject livesIconsContainer;
+    [SerializeField] GameObject speedIconsContainer;
 
     [SerializeField] GameObject lifeIcon;
+    [SerializeField] GameObject speedIcon;
 
+    Color speedBarDefaultColor;
+
+    int speed = 1;
 
     public static UIManager Instance { get; private set; }
 
@@ -31,6 +36,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void Start() 
+    {
+        speedBarDefaultColor = speedIcon.GetComponent<Image>().color;
+        EventManager.AddNoArgumentListener(IncreaseSpeed, EventType.DifficultyChanged);
+        EventManager.AddNoArgumentListener(OnGameOver, EventType.GameOver);
+    }
+
     /// <summary>
     /// Callback for start button
     /// </summary>
@@ -38,6 +50,7 @@ public class UIManager : MonoBehaviour
     {
         startPanel.SetActive(false);
         HUDPanel.SetActive(true);
+        DisplaySpeed();
 
         GameManager.Instance.StartGame();
     }
@@ -48,11 +61,13 @@ public class UIManager : MonoBehaviour
     public void OnRetryClicked()
     {
         gameOverPanel.SetActive(false);
-
         GameManager.Instance.RestartGame();
+
+        speed = 1;
+        DisplaySpeed();
     }
 
-    public void OnGameOver()
+    private void OnGameOver()
     {
         gameOverPanel.SetActive(true);
     }
@@ -62,6 +77,30 @@ public class UIManager : MonoBehaviour
         highScoreText.text = "High Score: " + highScore.ToString();
     }
 
+    public void DisplaySpeed()
+    {
+        float alpha = 25f;
+
+        foreach (Transform child in speedIconsContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < speed; i++)
+        {
+            Image barIcon = Instantiate(speedIcon, speedIconsContainer.transform).GetComponent<Image>();
+            barIcon.color = new Color(speedBarDefaultColor.r, speedBarDefaultColor.g, 
+                                        speedBarDefaultColor.b, alpha / 255f);
+            alpha += 12f;
+        }
+    }
+
+    private void IncreaseSpeed()
+    {
+        speed++;
+        DisplaySpeed();
+    }
+
     public void DisplayScore(int score)
     {
         scoreText.text = "Score: " + score.ToString();
@@ -69,14 +108,14 @@ public class UIManager : MonoBehaviour
 
     public void DisplayLives(int lives)
     {
-        foreach (Transform child in livesPanel.transform)
+        foreach (Transform child in livesIconsContainer.transform)
         {
             Destroy(child.gameObject);
         }
 
         for (int i = 0; i < lives; i++)
         {
-            Instantiate(lifeIcon, livesPanel.transform);
+            Instantiate(lifeIcon, livesIconsContainer.transform);
         }
     }
 

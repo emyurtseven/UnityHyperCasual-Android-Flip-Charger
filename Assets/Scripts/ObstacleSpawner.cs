@@ -25,7 +25,7 @@ public class ObstacleSpawner : MonoBehaviour
         obstaclePrefabs = Resources.LoadAll<GameObject>("Prefabs/Obstacles");
         obstacleCount = obstaclePrefabs.Length;
 
-        EventManager.AddNoArgumentListener(OnDifficultyUpListener, EventType.DifficultyUp);
+        EventManager.AddNoArgumentListener(OnDifficultyChangedListener, EventType.DifficultyChanged);
 
         obstacleMoveSpeed = GameManager.Instance.GameSpeed;
         (minSpawnInterval, maxSpawnInterval) = GameManager.Instance.SpawnIntervals;
@@ -33,7 +33,7 @@ public class ObstacleSpawner : MonoBehaviour
         StartCoroutine(SpawnCoroutine());
     }
 
-    public void OnDifficultyUpListener()
+    private void OnDifficultyChangedListener()
     {
         obstacleMoveSpeed = GameManager.Instance.GameSpeed;
         (minSpawnInterval, maxSpawnInterval) = GameManager.Instance.SpawnIntervals;
